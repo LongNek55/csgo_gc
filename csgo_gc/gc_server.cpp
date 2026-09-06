@@ -66,6 +66,10 @@ void ServerGC::HandleMessage(uint32_t type, const void *data, uint32_t size)
             // server doesn't want a response so ignore
             break;
 
+        case k_EMsgGCCStrike15_v2_MatchmakingServerReservationResponse:
+            MatchmakingServerReservationResponse(messageRead);
+            break;
+
         case k_EMsgGC_IncrementKillCountAttribute:
             IncrementKillCountAttribute(messageRead);
             break;
@@ -268,6 +272,19 @@ void ServerGC::SendServerWelcome()
     PostToHost(HostEvent::Message, write.TypeMasked(), write.Data(), write.Size());
 
     m_sentWelcome = true;
+}
+
+void ServerGC::MatchmakingServerReservationResponse(GCMessageRead &messageRead)
+{
+    CMsgGCCStrike15_v2_MatchmakingServerReservationResponse response;
+    if (!messageRead.ReadProtobuf(response))
+    {
+        Platform::Print("Parsing MatchmakingServerReservationResponse failed, ignoring\n");
+        return;
+    }
+
+    Platform::Print("Matchmaking reservation accepted: id=%llu map=%s\n",
+        response.reservationid(), response.map().c_str());
 }
 
 void ServerGC::IncrementKillCountAttribute(GCMessageRead &messageRead)

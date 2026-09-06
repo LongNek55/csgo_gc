@@ -40,6 +40,11 @@
 // only show servers with the "csgo_gc" tag in the server browser
 "show_csgo_gc_servers_only"	"1"
 
+// local matchmaking reservation target
+"matchmaking_server_address"	"103.216.126.134:27015"
+"matchmaking_map"	"de_dust2"
+"matchmaking_server_id"	"1"
+
 // 0 = don't log anything
 // 1 = log to in-game console
 // 2 = log to in-game console and file (gc_log.txt)
