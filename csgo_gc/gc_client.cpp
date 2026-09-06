@@ -60,6 +60,10 @@ void ClientGC::HandleMessage(uint32_t type, const void *data, uint32_t size)
             OnClientHello(messageRead);
             break;
 
+        case k_EMsgGCCStrike15_v2_MatchmakingStart:
+            MatchmakingStart(messageRead);
+            break;
+
         case k_EMsgGCAdjustItemEquippedState:
             AdjustItemEquippedState(messageRead);
             break;
@@ -296,6 +300,49 @@ void ClientGC::OnClientHello(GCMessageRead &messageRead)
 
     // send all ranks here as well, it's a bit back and forth with real gc
     SendRankUpdate();
+}
+
+void ClientGC::MatchmakingStart(GCMessageRead &messageRead)
+{
+    CMsgGCCStrike15_v2_MatchmakingStart request;
+    if (!messageRead.ReadProtobuf(request))
+    {
+        Platform::Print("Parsing MatchmakingStart failed, ignoring\n");
+        return;
+    }
+
+    CMsgGCCStrike15_v2_MatchmakingGC2ClientUpdate update;
+    update.set_matchmaking(1);
+    update.add_waiting_account_id_sessions(AccountId());
+    SendMessageToGame(false, k_EMsgGCCStrike15_v2_MatchmakingGC2ClientUpdate, update);
+
+    CMsgGCCStrike15_v2_MatchmakingGC2ClientReserve reserve;
+    reserve.set_serverid(GetConfig().MatchmakingServerId());
+    reserve.set_reservationid(GameServerCookieId);
+    reserve.set_server_address(GetConfig().MatchmakingServerAddress());
+    reserve.set_map(GetConfig().MatchmakingMap());
+
+    auto *serverReservation = reserve.mutable_reservation();
+    serverReservation->set_game_type(request.game_type());
+    serverReservation->set_server_version(request.client_version());
+    if (request.account_ids_size() > 0)
+    {
+        for (uint32_t accountId : request.account_ids())
+        {
+            serverReservation->add_account_ids(accountId);
+        }
+    }
+    else
+    {
+        serverReservation->add_account_ids(AccountId());
+    }
+
+    SendMessageToGame(false, k_EMsgGCCStrike15_v2_MatchmakingGC2ClientReserve, reserve);
+
+    update.clear_waiting_account_id_sessions();
+    update.set_matchmaking(0);
+    update.add_ongoingmatch_account_id_sessions(AccountId());
+    SendMessageToGame(false, k_EMsgGCCStrike15_v2_MatchmakingGC2ClientUpdate, update);
 }
 
 void ClientGC::AdjustItemEquippedState(GCMessageRead &messageRead)

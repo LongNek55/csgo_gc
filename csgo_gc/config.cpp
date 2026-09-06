@@ -24,6 +24,9 @@ GCConfig::GCConfig()
 
     m_appIdOverride = config.GetNumber("appid_override", m_appIdOverride);
     m_showCsgoGCServersOnly = config.GetNumber("show_csgo_gc_servers_only", m_showCsgoGCServersOnly);
+    m_matchmakingServerAddress = std::string{ config.GetString("matchmaking_server_address", m_matchmakingServerAddress) };
+    m_matchmakingMap = std::string{ config.GetString("matchmaking_map", m_matchmakingMap) };
+    m_matchmakingServerId = config.GetNumber("matchmaking_server_id", m_matchmakingServerId);
 
     const KeyValue *ranks = config.GetSubkey("ranks");
     if (ranks)

@@ -28,6 +28,9 @@ public:
     // options used by steam hook
     uint32_t AppIdOverride() const { return m_appIdOverride; }
     bool ShowCsgoGCServersOnly() const { return m_showCsgoGCServersOnly; }
+    const std::string &MatchmakingServerAddress() const { return m_matchmakingServerAddress; }
+    const std::string &MatchmakingMap() const { return m_matchmakingMap; }
+    uint64_t MatchmakingServerId() const { return m_matchmakingServerId; }
 
     RankId CompetitiveRank() const { return m_competitiveRank; }
     int CompetitiveWins() const { return m_competitiveWins; }
@@ -54,6 +57,9 @@ private:
     // and then wonder why the game doesn't work and open an issue on github otherwise
     uint32_t m_appIdOverride{ 4465480 };
     bool m_showCsgoGCServersOnly{ true };
+    std::string m_matchmakingServerAddress{ "127.0.0.1:27015" };
+    std::string m_matchmakingMap{ "de_dust2" };
+    uint64_t m_matchmakingServerId{ 1 };
 
     RankId m_competitiveRank{ RankNone };
     int m_competitiveWins{ 0 };
